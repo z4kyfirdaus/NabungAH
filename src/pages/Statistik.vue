@@ -4,47 +4,50 @@ import { getData } from '../data/storage'
 
 const data = getData()
 
-const totalMasuk = computed(() =>
-  data.transaksi
-    .filter(t => t.jenis === 'masuk')
-    .reduce((a, b) => a + b.nominal, 0)
-)
+const totalMasuk = computed(() => {
+  if (!data.transaksi) return 0
+  return data.transaksi
+    .filter(t => t.tipe === 'tabung' || t.tipe === 'topup')
+    .reduce((a, b) => a + Number(b.jumlah || 0), 0)
+})
 
-const totalKeluar = computed(() =>
-  data.transaksi
-    .filter(t => t.jenis === 'keluar')
-    .reduce((a, b) => a + b.nominal, 0)
-)
+const totalKeluar = computed(() => {
+  if (!data.transaksi) return 0
+  return data.transaksi
+    .filter(t => t.tipe === 'tarik' || t.tipe === 'tarik_wallet')
+    .reduce((a, b) => a + Number(b.jumlah || 0), 0)
+})
 
-const totalSaldo = computed(() =>
-  data.targets.reduce((a, b) => a + b.saldo, 0)
-)
+const totalSaldo = computed(() => {
+  if (!data.targets) return 0
+  return data.targets.reduce((a, b) => a + Number(b.saldo || 0), 0)
+})
 
-const jumlahTarget = computed(() =>
-  data.targets.length
-)
+const jumlahTarget = computed(() => {
+  return data.targets ? data.targets.length : 0
+})
 
 const transaksiHariIni = computed(() => {
-
+  if (!data.transaksi) return 0
   const hariIni = new Date().toLocaleDateString('id-ID')
-
-  return data.transaksi.filter(
-    t => t.tanggal === hariIni
-  ).length
-
+  return data.transaksi.filter(t => t.tanggal === hariIni).length
 })
 </script>
 
 <template>
   <div class="page clean-theme">
-    
     <div class="content-wrapper">
       
       <!-- HEADER -->
       <div class="header">
-        <h2>📊 Statistik Keuangan</h2>
-        <p>Ringkasan dan analitik seluruh aktivitas menabungmu</p>
-      </div>
+  <div class="header-title-wrapper">
+    <div class="header-icon-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0061FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+    </div>
+    <h2>Statistik Keuangan</h2>
+  </div>
+  <p>Ringkasan, analitik, dan riwayat aliran dana secara transparan</p>
+</div>
 
       <!-- KARTU UTAMA (TOTAL TABUNGAN) -->
       <div class="card main-stat-card">
@@ -55,37 +58,72 @@ const transaksiHariIni = computed(() => {
         </div>
       </div>
 
-      <!-- GRID STATISTIK LAINNYA (BENTO STYLE) -->
+      <!-- GRID STATISTIK LAINNYA -->
       <div class="stats-grid">
         
-        <!-- Total Menabung -->
+        <!-- Total Pemasukan / Menabung -->
         <div class="card stat-item-card">
-          <div class="icon-box green-bg">📥</div>
-          <p class="stat-label">Total Menabung</p>
+          <div class="icon-box green-bg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <p class="stat-label">Total Masuk & Top Up</p>
           <h2 class="stat-value text-green">Rp{{ totalMasuk.toLocaleString('id-ID') }}</h2>
         </div>
 
-        <!-- Total Pengeluaran -->
+        <!-- Total Penarikan / Pengeluaran -->
         <div class="card stat-item-card">
-          <div class="icon-box red-bg">📤</div>
-          <p class="stat-label">Total Pengeluaran</p>
+          <div class="icon-box red-bg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          </div>
+          <p class="stat-label">Total Penarikan Dana</p>
           <h2 class="stat-value text-red">Rp{{ totalKeluar.toLocaleString('id-ID') }}</h2>
         </div>
 
         <!-- Jumlah Target -->
         <div class="card stat-item-card">
-          <div class="icon-box blue-bg">🎯</div>
+          <div class="icon-box blue-bg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0061FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
           <p class="stat-label">Jumlah Target</p>
-          <h2 class="stat-value text-blue">{{ jumlahTarget }}</h2>
+          <h2 class="stat-value text-blue">{{ jumlahTarget }} Target</h2>
         </div>
 
         <!-- Transaksi Hari Ini -->
         <div class="card stat-item-card">
-          <div class="icon-box purple-bg">📅</div>
+          <div class="icon-box purple-bg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          </div>
           <p class="stat-label">Transaksi Hari Ini</p>
-          <h2 class="stat-value text-purple">{{ transaksiHariIni }}</h2>
+          <h2 class="stat-value text-purple">{{ transaksiHariIni }} Aktivitas</h2>
         </div>
 
+      </div>
+
+      <!-- RIWAYAT ALIRAN DANA & WALLET TERKAIT -->
+      <div class="history-section">
+        <h3 class="section-title">Riwayat Aliran & Penarikan Saldo</h3>
+
+        <div v-if="data.transaksi && data.transaksi.length > 0" class="history-list">
+          <div v-for="trx in data.transaksi" :key="trx.id" class="card history-card">
+            <div class="history-left">
+              <div class="history-icon" :class="trx.tipe === 'tabung' || trx.tipe === 'topup' ? 'bg-green-soft' : 'bg-red-soft'">
+                <svg v-if="trx.tipe === 'tabung' || trx.tipe === 'topup'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="19" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </div>
+              <div>
+                <h4 class="history-title">{{ trx.keterangan }}</h4>
+                <p class="history-date">{{ trx.tanggal }}</p>
+              </div>
+            </div>
+            <div class="history-right" :class="trx.tipe === 'tabung' || trx.tipe === 'topup' ? 'text-green' : 'text-red'">
+              {{ trx.tipe === 'tabung' || trx.tipe === 'topup' ? '+' : '-' }}Rp{{ Number(trx.jumlah || 0).toLocaleString('id-ID') }}
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="card empty-history">
+          <p>Belum ada riwayat aliran dana atau penarikan tercatat.</p>
+        </div>
       </div>
 
     </div>
@@ -111,7 +149,6 @@ const transaksiHariIni = computed(() => {
   width: 100%;
   max-width: 480px;
   padding: 24px;
-  /* Padding bawah diperbesar agar aman tidak tertutup navbar */
   padding-bottom: 140px; 
 }
 
@@ -137,20 +174,19 @@ const transaksiHariIni = computed(() => {
 .card {
   background: #FFFFFF;
   border-radius: 20px;
-  padding: 24px;
+  padding: 20px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.03);
   border: 1px solid #F1F5F9;
 }
 
-/* --- KARTU UTAMA (TOTAL TABUNGAN) --- */
+/* --- KARTU UTAMA --- */
 .main-stat-card {
   background: linear-gradient(135deg, #0061FF 0%, #60EFFF 100%);
   color: white;
   box-shadow: 0 12px 24px rgba(0, 97, 255, 0.2);
   border: none;
   margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
+  padding: 24px;
 }
 
 .stat-label-light {
@@ -179,13 +215,15 @@ const transaksiHariIni = computed(() => {
   font-weight: 800;
   margin: 0;
   line-height: 1.2;
+  color: #FFFFFF;
 }
 
-/* --- GRID STATISTIK KECIL --- */
+/* --- GRID STATISTIK Kecil --- */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  margin-bottom: 32px;
 }
 
 .stat-item-card {
@@ -193,12 +231,6 @@ const transaksiHariIni = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.stat-item-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
 .icon-box {
@@ -208,7 +240,6 @@ const transaksiHariIni = computed(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 18px;
   margin-bottom: 16px;
 }
 
@@ -226,15 +257,83 @@ const transaksiHariIni = computed(() => {
 
 .stat-value {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   word-break: break-word;
   line-height: 1.2;
 }
 
-/* WARNA TEKS MASING-MASING KARTU */
 .text-green { color: #059669; }
 .text-red { color: #DC2626; }
 .text-blue { color: #0061FF; }
 .text-purple { color: #7C3AED; }
+
+/* --- RIWAYAT SECTION --- */
+.section-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 16px 0;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.history-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.history-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.bg-green-soft { background: #DCFCE7; }
+.bg-red-soft { background: #FEE2E2; }
+
+.history-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0 0 2px 0;
+  word-break: break-word;
+}
+
+.history-date {
+  font-size: 12px;
+  color: #94A3B8;
+  margin: 0;
+  font-weight: 600;
+}
+
+.history-right {
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.empty-history {
+  text-align: center;
+  color: #64748B;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 30px;
+}
 </style>

@@ -13,32 +13,33 @@ const targetAktif = computed(() =>
 )
 
 function simpanTransaksi() {
-
   if (!targetAktif.value) {
     alert('Belum ada target aktif')
     return
   }
 
   if (!nominal.value) {
-    alert('Masukkan nominal')
+    alert('Masukkan nominal terlebih dahulu')
     return
   }
 
   const jumlah = Number(nominal.value)
 
   if (jenis.value === 'masuk') {
+    // Menabung: Saldo target bertambah
     targetAktif.value.saldo += jumlah
   } else {
-
+    // Penarikan/Pengeluaran: Saldo target berkurang
     if (jumlah > targetAktif.value.saldo) {
-      alert('Saldo tidak cukup')
+      alert('Saldo pada target aktif tidak mencukupi')
       return
     }
-
     targetAktif.value.saldo -= jumlah
   }
 
-  data.transaksi.push({
+  // Simpan ke riwayat transaksi terpusat (hanya terikat target)
+  if (!data.transaksi) data.transaksi = []
+  data.transaksi.unshift({
     id: Date.now(),
     targetId: targetAktif.value.id,
     jenis: jenis.value,
@@ -52,35 +53,34 @@ function simpanTransaksi() {
   nominal.value = ''
   catatan.value = ''
 
-  alert('Transaksi berhasil')
+  alert('Transaksi berhasil disimpan!')
 }
 
 const transaksiTarget = computed(() => {
-
-  if (!targetAktif.value) return []
-
-  return data.transaksi
-    .filter(item => item.targetId === targetAktif.value.id)
-    .sort((a,b)=> b.id-a.id)
-
+  if (!targetAktif.value || !data.transaksi) return []
+  return data.transaksi.filter(item => item.targetId === targetAktif.value.id)
 })
 </script>
 
 <template>
   <div class="page clean-theme">
-    
     <div class="content-wrapper">
       
       <!-- HEADER -->
       <div class="header">
-        <h2>💸 Transaksi Keuangan</h2>
-        <p>Catat pemasukan atau pengeluaran target aktifmu</p>
+        <div class="header-title-wrapper">
+          <div class="header-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0061FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <h2>Transaksi Keuangan</h2>
+        </div>
+        <p>Catat pemasukan atau pengeluaran tabungan targetmu</p>
       </div>
 
       <!-- KARTU TARGET AKTIF -->
       <div v-if="targetAktif" class="card active-target-card">
         <div class="target-badge">Target Aktif</div>
-        <h3 class="target-title">🎯 {{ targetAktif.nama }}</h3>
+        <h3 class="target-title">Target: {{ targetAktif.nama }}</h3>
         <p class="balance-label">Saldo Saat Ini</p>
         <div class="balance-amount-container">
           <span class="currency">Rp</span>
@@ -89,7 +89,9 @@ const transaksiTarget = computed(() => {
       </div>
 
       <div v-else class="card empty-target-card">
-        <div class="empty-icon">⚠️</div>
+        <div class="empty-icon-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        </div>
         <h3>Belum Ada Target Aktif</h3>
         <p>Silakan aktifkan salah satu target terlebih dahulu pada menu Target.</p>
       </div>
@@ -101,8 +103,8 @@ const transaksiTarget = computed(() => {
         <div class="input-group">
           <label>Jenis Transaksi</label>
           <select v-model="jenis">
-            <option value="masuk">➕ Menabung (Pemasukan)</option>
-            <option value="keluar">➖ Pengeluaran (Penarikan)</option>
+            <option value="masuk">Menabung (Pemasukan ke Target)</option>
+            <option value="keluar">Pengeluaran (Penarikan dari Target)</option>
           </select>
         </div>
 
@@ -119,7 +121,7 @@ const transaksiTarget = computed(() => {
           <label>Catatan (Opsional)</label>
           <input
             v-model="catatan"
-            placeholder="Contoh: Menyisihkan uang jajan"
+            placeholder="Contoh: Menyisihkan uang saku harian"
           >
         </div>
 
@@ -132,7 +134,7 @@ const transaksiTarget = computed(() => {
 
       <!-- RIWAYAT TRANSAKSI -->
       <div class="list-header">
-        <h3>📜 Riwayat Transaksi</h3>
+        <h3>Riwayat Transaksi Target</h3>
         <span class="badge-count" v-if="transaksiTarget.length">{{ transaksiTarget.length }} Catatan</span>
       </div>
 
@@ -148,15 +150,23 @@ const transaksiTarget = computed(() => {
           :class="trx.jenis === 'masuk' ? 'border-green' : 'border-red'"
         >
           <div class="row">
-            <strong :class="trx.jenis === 'masuk' ? 'text-green' : 'text-red'">
-              {{ trx.jenis === 'masuk' ? '🟢 Menabung' : '🔴 Pengeluaran' }}
-            </strong>
+            <div class="history-type-info">
+              <div class="trx-icon-box" :class="trx.jenis === 'masuk' ? 'bg-green-soft' : 'bg-red-soft'">
+                <svg v-if="trx.jenis === 'masuk'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="19" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </div>
+              <strong :class="trx.jenis === 'masuk' ? 'text-green' : 'text-red'">
+                {{ trx.jenis === 'masuk' ? 'Menabung' : 'Penarikan' }}
+              </strong>
+            </div>
             <strong class="nominal-text">
-              {{ trx.jenis === 'masuk' ? '+' : '-' }}Rp{{ trx.nominal.toLocaleString('id-ID') }}
+              {{ trx.jenis === 'masuk' ? '+' : '-' }}Rp{{ Number(trx.nominal || 0).toLocaleString('id-ID') }}
             </strong>
           </div>
 
-          <p class="history-catatan">{{ trx.catatan || 'Tidak ada catatan' }}</p>
+          <div class="history-details">
+            <p class="history-catatan">{{ trx.catatan || 'Tidak ada catatan' }}</p>
+          </div>
 
           <div class="history-footer">
             <small>{{ trx.tanggal }}</small>
@@ -187,7 +197,6 @@ const transaksiTarget = computed(() => {
   width: 100%;
   max-width: 480px;
   padding: 24px;
-  /* PADDING BAWAH DIPERBESAR SUPAYA TIDAK TERTUTUP NAVBAR */
   padding-bottom: 150px; 
 }
 
@@ -273,6 +282,7 @@ const transaksiTarget = computed(() => {
   font-weight: 800;
   margin: 0;
   line-height: 1.2;
+  color: #FFFFFF;
 }
 
 .empty-target-card {
@@ -281,9 +291,15 @@ const transaksiTarget = computed(() => {
   border: 1px dashed #CBD5E1;
 }
 
-.empty-icon {
-  font-size: 36px;
-  margin-bottom: 8px;
+.empty-icon-box {
+  width: 50px;
+  height: 50px;
+  background: #FEF3C7;
+  border-radius: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 12px auto;
 }
 
 .empty-target-card h3 {
@@ -438,17 +454,37 @@ input:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
+
+.history-type-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trx-icon-box {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bg-green-soft { background: #DCFCE7; }
+.bg-red-soft { background: #FEE2E2; }
 
 .text-green {
   color: #059669;
   font-weight: 800;
+  font-size: 14px;
 }
 
 .text-red {
   color: #DC2626;
   font-weight: 800;
+  font-size: 14px;
 }
 
 .nominal-text {
@@ -457,10 +493,17 @@ input:focus {
   color: #0F172A;
 }
 
+.history-details {
+  background: #F8FAFC;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
 .history-catatan {
-  margin: 0 0 10px 0;
-  font-size: 14px;
-  color: #475569;
+  margin: 0;
+  font-size: 13px;
+  color: #64748B;
   word-break: break-word;
 }
 

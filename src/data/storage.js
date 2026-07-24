@@ -14,6 +14,7 @@ export function getData() {
         foto: ""
       },
       targets: [],
+      wallet:[],
       transaksi: []
     }
 
@@ -31,7 +32,7 @@ export function getData() {
 
     if (!result.targets) result.targets = []
     if (!result.transaksi) result.transaksi = []
-
+if (!result.targets) result.targets = []
   }
 
   return result

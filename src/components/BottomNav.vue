@@ -20,6 +20,10 @@
       <router-link to="/setting" class="nav-item" title="Pengaturan">
         <span class="nav-icon">⚙️</span>
       </router-link>
+      
+      <router-link to="/wallet" class="nav-item" title="Wallet">
+  <span class="nav-icon">💼</span>
+</router-link>
     </div>
   </nav>
 </template>

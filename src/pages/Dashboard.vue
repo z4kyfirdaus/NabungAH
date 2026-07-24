@@ -12,6 +12,11 @@ const notif = computed(()=>{
     return cekNotifikasi(data)
 })
 
+const totalSaldo = wallets.reduce(
+  (total, wallet) => total + wallet.saldo,
+  0
+)
+
 function tambahTarget() {
   router.push('/target')
 }

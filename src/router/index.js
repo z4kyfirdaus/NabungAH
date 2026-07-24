@@ -5,6 +5,7 @@ import Target from '../pages/Target.vue'
 import Transaksi from '../pages/Transaksi.vue'
 import Statistik from '../pages/Statistik.vue'
 import Setting from '../pages/Setting.vue'
+import Wallet from '../pages/Wallet.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -28,7 +29,12 @@ const router = createRouter({
     {
       path: '/setting',
       component: Setting
-    }
+    },
+    {
+    path:'/wallet',
+    name:'Wallet',
+    component:()=>import('../pages/Wallet.vue')
+},
   ]
 })
 

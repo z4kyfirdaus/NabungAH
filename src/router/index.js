@@ -47,7 +47,7 @@ const router = createRouter({
 // Route Guard untuk memeriksa status login
 router.beforeEach(async (to, from, next) => {
   try {
-    const currentUser = await getCurrentUser();[cite: 1]
+    const currentUser = await getCurrentUser();
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
     const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
 

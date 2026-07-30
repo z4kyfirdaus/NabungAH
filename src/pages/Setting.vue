@@ -1,7 +1,18 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { getData, saveData } from '../data/storage'
 import { useTheme } from '../utils/theme'
+import { useRouter } from 'vue-router'
+import { logoutUser } from '../firebase/auth'
+
+const router = useRouter()
+
+const handleLogout = async () => {
+  if (confirm('Apakah kamu yakin ingin keluar dari akun?')) {
+    await logoutUser()
+    router.push('/login')
+  }
+}
 
 const data = getData()
 const { isDarkMode } = useTheme()
@@ -77,6 +88,23 @@ function resetData() {
 
       <!-- KARTU MENU PREFERENSI -->
       <div class="card menu-card">
+
+        <!-- MENU NABUNGAH AI (BARU) -->
+        <div class="menu-row clickable" @click="router.push('/ai')">
+          <div class="menu-label">
+            <span class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a8 8 0 0 0-8 8c0 5.25 7 13 8 13s8-7.75 8-13a8 8 0 0 0-8-8z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </span>
+            <span class="label" style="font-weight: 800; color: #10B981;">NabungAH AI</span>
+          </div>
+          <span class="arrow-icon" style="font-size: 18px; color: #10B981; font-weight: bold;">›</span>
+        </div>
+
+        <div class="divider"></div>
+
         <!-- Toggle Dark Mode -->
         <div class="menu-row">
           <div class="menu-label">
@@ -144,6 +172,16 @@ function resetData() {
           </div>
         </transition>
       </div>
+
+      <!-- TOMBOL LOGOUT (RAPI) -->
+      <button class="btn-logout" @click="handleLogout">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Keluar dari Akun</span>
+      </button>
 
       <!-- KARTU RESET DATA -->
       <div class="card danger-card">
@@ -464,6 +502,30 @@ input:checked + .slider:before {
   font-size: 12px;
   color: #8E8E93;
   font-weight: 600;
+}
+
+/* STYLING TOMBOL LOGOUT */
+.btn-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  background-color: #FEF2F2;
+  color: #EF4444;
+  border: 1px solid #FEE2E2;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-logout:active {
+  transform: scale(0.98);
+  background-color: #FEE2E2;
 }
 
 .danger-card {

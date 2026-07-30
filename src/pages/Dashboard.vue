@@ -21,6 +21,11 @@ function bukaSetting() {
   router.push('/setting')
 }
 
+function bukaAi() {
+  showDrawer.value = false
+  router.push('/ai')
+}
+
 // Fungsi untuk memicu Native Push Notification (jika sudah jadi APK/PWA)
 function mintaIzinNotif() {
   if (!("Notification" in window)) {
@@ -139,6 +144,7 @@ const perHari = computed(() => {
           </button>
         </div>
 
+        <!-- AKUN PROFIL -->
         <div class="drawer-profile-content" @click="bukaSetting">
           <div class="drawer-avatar-wrapper">
             <img v-if="data.profile.foto" :src="data.profile.foto" class="drawer-avatar">
@@ -153,6 +159,21 @@ const perHari = computed(() => {
           <div class="drawer-arrow">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
+        </div>
+
+        <!-- TOMBOL NABUNGAH AI -->
+        <div class="drawer-ai-box" @click="bukaAi">
+          <div class="drawer-ai-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 7 13 8 13s8-7.75 8-13a8 8 0 0 0-8-8z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="drawer-ai-text">
+            <h5>NabungAH AI</h5>
+            <p>Konsultasi & tips menabung cerdas</p>
+          </div>
+          <div class="drawer-arrow-ai">›</div>
         </div>
 
         <!-- Tombol Aktifkan Notifikasi HP dalam Drawer -->
@@ -279,7 +300,7 @@ const perHari = computed(() => {
   overflow: hidden;
 }
 
-/* --- BACKGROUND EFEK CAHAYA DINAMIS (MENGHILANGKAN KESAN POLOS) --- */
+/* --- BACKGROUND EFEK CAHAYA DINAMIS --- */
 .bg-glow-effect {
   position: absolute;
   top: 0;
@@ -464,6 +485,63 @@ const perHari = computed(() => {
   color: #94A3B8;
 }
 
+/* Tombol AI dalam Drawer */
+.drawer-ai-box {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ECFDF5;
+  padding: 14px 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  border: 1px solid #A7F3D0;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+
+.drawer-ai-box:active {
+  background: #D1FAE5;
+  transform: scale(0.98);
+}
+
+.drawer-ai-icon {
+  width: 36px;
+  height: 36px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
+}
+
+.drawer-ai-text {
+  flex: 1;
+}
+
+.drawer-ai-text h5 {
+  margin: 0 0 2px 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #065F46;
+}
+
+.drawer-ai-text p {
+  margin: 0;
+  font-size: 11px;
+  color: #047857;
+  font-weight: 600;
+}
+
+.drawer-arrow-ai {
+  font-size: 18px;
+  font-weight: 700;
+  color: #10B981;
+}
+
 /* Tombol Notifikasi dalam Drawer */
 .drawer-notif-box {
   position: relative;
@@ -593,7 +671,7 @@ const perHari = computed(() => {
   background: #F8FAFC;
 }
 
-/* --- NOTIFIKASI DI HALAMAN (MODERN DESIGN) --- */
+/* --- NOTIFIKASI DI HALAMAN --- */
 .notif-card-box {
   position: relative;
   z-index: 1;
@@ -846,7 +924,6 @@ const perHari = computed(() => {
 }
 
 .text-blue {
-  content: '';
   color: #0284C7;
 }
 

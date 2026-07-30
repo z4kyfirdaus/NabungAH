@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import { getCurrentUser } from '../firebase/auth';
 
 // Import Halaman Auth
@@ -40,14 +40,14 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes
 });
 
 // Route Guard untuk memeriksa status login
 router.beforeEach(async (to, from, next) => {
   try {
-    const currentUser = await getCurrentUser();
+    const currentUser = await getCurrentUser();[cite: 1]
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
     const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
 

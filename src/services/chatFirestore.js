@@ -11,10 +11,10 @@ import {
 
 const db = getFirestore();
 
-// Helper untuk mendapatkan ref koleksi pesan milik user yang sedang login
+// Helper untuk mendapatkan ref koleksi pesan milik user yang sedang login (Aman dari null)
 function getUserMessagesRef() {
   const user = getAuth().currentUser;
-  if (!user) throw new Error("Pengguna belum terautentikasi");
+  if (!user) return null; // 👈 Ubah dari throw new Error menjadi return null
   return collection(db, "users", user.uid, "messages");
 }
 
@@ -22,6 +22,8 @@ function getUserMessagesRef() {
 export async function loadChatFromFirestore() {
   try {
     const messagesRef = getUserMessagesRef();
+    if (!messagesRef) return []; // 👈 Amankan jika user belum siap
+
     const q = query(messagesRef, orderBy("createdAt", "asc"));
     const querySnapshot = await getDocs(q);
 
@@ -46,6 +48,8 @@ export async function loadChatFromFirestore() {
 export async function saveMessageToFirestore(role, text) {
   try {
     const messagesRef = getUserMessagesRef();
+    if (!messagesRef) return; // 👈 Amankan jika user belum siap
+
     await addDoc(messagesRef, {
       role: role,
       text: text,

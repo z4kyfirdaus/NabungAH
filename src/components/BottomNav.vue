@@ -77,7 +77,7 @@ const { isDarkMode } = useTheme()
   justify-content: space-around;
   align-items: center;
   width: 100%;
-  max-width: 480px;
+  max-width: 100%;
   padding: 0 12px;
 }
 

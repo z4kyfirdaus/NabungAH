@@ -210,7 +210,7 @@ async function resetData() {
 }
 
 .content-wrapper {
-  max-width: 480px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 24px 20px 120px 20px;
 }

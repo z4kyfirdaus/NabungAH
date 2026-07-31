@@ -302,7 +302,9 @@ async function cairkanTarget(targetItem) {
   padding-bottom: 100px;
   background-color: #F4F7F9;
   min-height: 100vh;
-  max-width: 480px;
+}
+.content-wrapper {
+  max-width: 100%;
   margin: 0 auto;
   color: #1E293B;
 }

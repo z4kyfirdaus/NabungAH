@@ -823,8 +823,8 @@ const perHari = computed(() => {
   gap: 14px;
 }
 
-.icon-wrapper {
-  width: 46px;
+.content-wrapper {
+  max-width: 100%;
   height: 46px;
   background: #F0F9FF;
   border-radius: 14px;

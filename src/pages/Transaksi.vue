@@ -199,7 +199,7 @@ const transaksiTarget = computed(() => {
 
 .content-wrapper {
   width: 100%;
-  max-width: 480px;
+  max-width: 100%;
   padding: 24px;
   padding-bottom: 150px; 
 }

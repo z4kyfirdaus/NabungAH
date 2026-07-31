@@ -1,5 +1,5 @@
 <template>
-  <div class="ai-page">
+  <div class="ai-page" :class="{ dark: isDarkMode }">
     <div class="content-wrapper">
       
       <!-- HEADER -->
@@ -125,6 +125,9 @@
 import { ref, onMounted } from 'vue';
 import { askGeminiSavings } from '../services/gemini';
 import { loadChatFromFirestore, saveMessageToFirestore } from '../services/chatFirestore';
+import { useTheme } from '../utils/theme';
+
+const { isDarkMode } = useTheme();
 
 const userQuery = ref('');
 const messages = ref([]);
@@ -260,7 +263,7 @@ const sendQuickPrompt = (promptText) => {
 .content-wrapper {
   max-width: 480px;
   margin: 0 auto;
-  padding: 24px 20px 140px 20px;
+  padding: 24px 20px 180px 20px;
 }
 
 .header-title-wrapper {
@@ -410,13 +413,14 @@ const sendQuickPrompt = (promptText) => {
 /* INPUT FORM AREA */
 .input-container-wrapper {
   position: fixed;
-  bottom: 60px;
+  bottom: 92px;
   left: 0;
   right: 0;
   max-width: 480px;
   margin: 0 auto;
   padding: 0 20px;
   box-sizing: border-box;
+  z-index: 100;
 }
 
 .image-preview-bar {
@@ -513,5 +517,57 @@ const sendQuickPrompt = (promptText) => {
 .btn-send:disabled {
   background: #cbd5e1;
   cursor: not-allowed;
+}
+
+/* ============ DARK MODE ============ */
+.ai-page.dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.ai-page.dark .content-wrapper {
+  background-color: #000000;
+}
+
+.ai-page.dark .message-bubble.ai {
+  background-color: #121212;
+  background: #121212;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.ai-page.dark .input-card {
+  background: #121212;
+  border-color: #27272a;
+}
+
+.ai-page.dark .image-preview-bar {
+  background-color: #121212;
+  border-color: #27272a;
+}
+
+.ai-page.dark .chip-btn,
+.ai-page.dark .btn-attach {
+  background-color: #18181b;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.ai-page.dark .input-card input[type="text"] {
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.ai-page.dark .header-icon-box {
+  background: #052e16;
+}
+
+.ai-page.dark .header h1 {
+  color: #ffffff;
+}
+
+.ai-page.dark .subtitle,
+.ai-page.dark .section-label {
+  color: #a1a1aa;
 }
 </style>

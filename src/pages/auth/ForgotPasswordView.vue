@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-wrapper">
+  <div class="auth-wrapper" :class="{ dark: isDarkMode }">
     <div class="auth-card">
       <div class="brand-header">
         <div class="logo-badge">
@@ -39,6 +39,10 @@
 <script setup>
 import { ref } from 'vue';
 import { resetPassword } from '../../firebase/auth';
+import { showAlert } from '../../utils/modal';
+import { useTheme } from '../../utils/theme';
+
+const { isDarkMode } = useTheme();
 
 const email = ref('');
 const loading = ref(false);
@@ -47,9 +51,9 @@ const handleReset = async () => {
   loading.value = true;
   try {
     await resetPassword(email.value);
-    alert('Email pemulihan password telah dikirim! Silakan periksa kotak masuk email kamu.');
+    showAlert('Email pemulihan password telah dikirim! Silakan periksa kotak masuk email kamu.', 'Email Terkirim', 'success');
   } catch (error) {
-    alert(error.message);
+    showAlert(error.message || 'Gagal mengirim email reset password.', 'Gagal', 'error');
   } finally {
     loading.value = false;
   }
@@ -57,7 +61,10 @@ const handleReset = async () => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
 .auth-wrapper {
+  font-family: 'Nunito', sans-serif;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -83,8 +90,8 @@ const handleReset = async () => {
 .logo-badge {
   width: 56px;
   height: 56px;
-  background-color: #ecfdf5;
-  color: #10b981;
+  background-color: #E0F2FE;
+  color: #0061FF;
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -141,24 +148,24 @@ const handleReset = async () => {
 }
 
 .form-group input:focus {
-  border-color: #10b981;
+  border-color: #0061FF;
 }
 
 .btn-primary {
-  background-color: #10b981;
+  background: linear-gradient(135deg, #0061FF 0%, #38BDF8 100%);
   color: white;
   border: none;
   padding: 14px;
   border-radius: 12px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   margin-top: 8px;
-  transition: background-color 0.2s;
+  transition: opacity 0.2s;
 }
 
 .btn-primary:hover {
-  background-color: #059669;
+  opacity: 0.9;
 }
 
 .btn-primary:disabled {
@@ -174,8 +181,44 @@ const handleReset = async () => {
 }
 
 .auth-footer a {
-  color: #10b981;
+  color: #0061FF;
   text-decoration: none;
   font-weight: 600;
+}
+
+/* ============ DARK MODE ============ */
+.auth-wrapper.dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.auth-wrapper.dark .auth-card {
+  background-color: #121212;
+  border: 1px solid #27272a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.auth-wrapper.dark .logo-badge {
+  background-color: #1a1a2e;
+}
+
+.auth-wrapper.dark .brand-header h2 {
+  color: #ffffff;
+}
+
+.auth-wrapper.dark .brand-header p,
+.auth-wrapper.dark .form-group label,
+.auth-wrapper.dark .auth-footer {
+  color: #a1a1aa;
+}
+
+.auth-wrapper.dark .form-group input {
+  background-color: #18181b;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.auth-wrapper.dark .form-group input:focus {
+  border-color: #0061FF;
 }
 </style>

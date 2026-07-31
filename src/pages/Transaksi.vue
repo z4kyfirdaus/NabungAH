@@ -1,6 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { getData, saveData } from '../data/storage'
+import { showAlert } from '../utils/modal'
+import { useTheme } from '../utils/theme'
+
+const { isDarkMode } = useTheme()
 
 const data = getData()
 
@@ -14,12 +18,12 @@ const targetAktif = computed(() =>
 
 function simpanTransaksi() {
   if (!targetAktif.value) {
-    alert('Belum ada target aktif')
+    showAlert('Belum ada target aktif. Silakan pilih atau aktifkan target terlebih dahulu di menu Target.', 'Target Aktif Belum Ada', 'warning')
     return
   }
 
-  if (!nominal.value) {
-    alert('Masukkan nominal terlebih dahulu')
+  if (!nominal.value || Number(nominal.value) <= 0) {
+    showAlert('Masukkan nominal transaksi yang valid.', 'Nominal Kosong', 'warning')
     return
   }
 
@@ -31,7 +35,7 @@ function simpanTransaksi() {
   } else {
     // Penarikan/Pengeluaran: Saldo target berkurang
     if (jumlah > targetAktif.value.saldo) {
-      alert('Saldo pada target aktif tidak mencukupi')
+      showAlert('Saldo pada target aktif tidak mencukupi untuk penarikan ini.', 'Saldo Tidak Cukup', 'error')
       return
     }
     targetAktif.value.saldo -= jumlah
@@ -53,7 +57,7 @@ function simpanTransaksi() {
   nominal.value = ''
   catatan.value = ''
 
-  alert('Transaksi berhasil disimpan!')
+  showAlert('Transaksi berhasil disimpan!', 'Berhasil', 'success')
 }
 
 const transaksiTarget = computed(() => {
@@ -63,7 +67,7 @@ const transaksiTarget = computed(() => {
 </script>
 
 <template>
-  <div class="page clean-theme">
+  <div class="page clean-theme" :class="{ dark: isDarkMode }">
     <div class="content-wrapper">
       
       <!-- HEADER -->
@@ -516,5 +520,63 @@ small {
   color: #94A3B8;
   font-size: 12px;
   font-weight: 600;
+}
+
+/* ============ DARK MODE ============ */
+.page.dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.page.dark .card,
+.page.dark .empty-target-card,
+.page.dark .history-card,
+.page.dark .empty-history {
+  background-color: #121212;
+  background: #121212;
+  border-color: #27272a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.page.dark input,
+.page.dark select,
+.page.dark .history-details {
+  background-color: #18181b;
+  background: #18181b;
+  color: #ffffff;
+  border-color: #27272a;
+}
+
+.page.dark .header-icon-box {
+  background: #1a1a2e;
+}
+
+.page.dark .header h2,
+.page.dark .section-title,
+.page.dark .list-header h3,
+.page.dark .nominal-text,
+.page.dark .empty-target-card h3 {
+  color: #ffffff;
+}
+
+.page.dark .header p,
+.page.dark label,
+.page.dark .empty-target-card p,
+.page.dark .history-catatan,
+.page.dark small {
+  color: #a1a1aa;
+}
+
+.page.dark .chip {
+  background-color: #18181b;
+  border-color: #27272a;
+  color: #a1a1aa;
+}
+
+.page.dark .chip.active {
+  background-color: #0061FF;
+  border-color: #0061FF;
+  color: #ffffff;
 }
 </style>

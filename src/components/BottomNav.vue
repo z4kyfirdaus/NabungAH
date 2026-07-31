@@ -1,5 +1,10 @@
+<script setup>
+import { useTheme } from '../utils/theme'
+const { isDarkMode } = useTheme()
+</script>
+
 <template>
-  <nav class="bottom-nav">
+  <nav class="bottom-nav" :class="{ dark: isDarkMode }">
     <div class="nav-container">
       
       <!-- Beranda -->
@@ -113,5 +118,16 @@
 
 .router-link-active .nav-icon-box {
   transform: scale(1.15);
+}
+
+/* ============ DARK MODE ============ */
+.bottom-nav.dark {
+  background: #0a0a0a;
+  border-top: 1px solid #27272a;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.8);
+}
+
+.bottom-nav.dark .nav-item {
+  color: #a1a1aa;
 }
 </style>

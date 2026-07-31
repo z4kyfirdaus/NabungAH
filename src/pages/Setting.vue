@@ -4,11 +4,13 @@ import { getData, saveData } from '../data/storage'
 import { useTheme } from '../utils/theme'
 import { useRouter } from 'vue-router'
 import { logoutUser } from '../firebase/auth'
+import { showAlert, showConfirm } from '../utils/modal'
 
 const router = useRouter()
 
 const handleLogout = async () => {
-  if (confirm('Apakah kamu yakin ingin keluar dari akun?')) {
+  const confirmed = await showConfirm('Apakah kamu yakin ingin keluar dari akun?', 'Konfirmasi Keluar', 'Ya, Keluar', 'Batal')
+  if (confirmed) {
     await logoutUser()
     router.push('/login')
   }
@@ -37,11 +39,12 @@ function simpanProfil() {
   data.profile.nama = nama.value
   data.profile.foto = foto.value
   saveData(data)
-  alert('Profil berhasil disimpan')
+  showAlert('Profil berhasil disimpan!', 'Berhasil', 'success')
 }
 
-function resetData() {
-  if (confirm('Peringatan: Seluruh data tabungan dan riwayat akan terhapus. Lanjutkan?')) {
+async function resetData() {
+  const confirmed = await showConfirm('Peringatan: Seluruh data tabungan dan riwayat akan terhapus. Lanjutkan?', 'Reset Aplikasi', 'Hapus Data', 'Batal')
+  if (confirmed) {
     localStorage.clear()
     location.reload()
   }
@@ -49,7 +52,7 @@ function resetData() {
 </script>
 
 <template>
-  <div class="setting-page">
+  <div class="setting-page" :class="{ dark: isDarkMode }">
     <div class="content-wrapper">
       
       <div class="header">
@@ -561,5 +564,102 @@ input:checked + .slider:before {
 
 .btn-reset:active {
   opacity: 0.8;
+}
+
+/* ============ DARK MODE ============ */
+.setting-page.dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.setting-page.dark .content-wrapper {
+  background-color: #000000;
+}
+
+.setting-page.dark .card,
+.setting-page.dark .profile-card,
+.setting-page.dark .menu-card {
+  background-color: #121212;
+  background: #121212;
+  border-color: #27272a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.setting-page.dark .about-content {
+  background-color: #121212;
+  background: #121212;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.setting-page.dark .about-description,
+.setting-page.dark .info-list {
+  background-color: #18181b;
+  background: #18181b;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.setting-page.dark .input-group input {
+  background-color: #18181b;
+  background: #18181b;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.setting-page.dark .header-icon-box {
+  background: #1a1a2e;
+}
+
+.setting-page.dark .header h1,
+.setting-page.dark .menu-row,
+.setting-page.dark .input-group label,
+.setting-page.dark .info-item strong,
+.setting-page.dark .about-inner h3,
+.setting-page.dark .danger-text h4 {
+  color: #ffffff;
+}
+
+.setting-page.dark .label,
+.setting-page.dark .arrow-icon,
+.setting-page.dark .copyright,
+.setting-page.dark .danger-text p,
+.setting-page.dark .info-item span {
+  color: #a1a1aa;
+}
+
+.setting-page.dark .divider {
+  background-color: #27272a;
+}
+
+.setting-page.dark .edit-photo-btn {
+  background: #18181b;
+  border-color: #27272a;
+  color: #60a5fa;
+}
+
+.setting-page.dark .badge {
+  background: #1a1a3e;
+  color: #60a5fa;
+}
+
+.setting-page.dark .btn-logout {
+  background-color: #1a0505;
+  border-color: #7f1d1d;
+  color: #f87171;
+}
+
+.setting-page.dark .danger-card {
+  background: #1a0505;
+  border-color: #7f1d1d;
+}
+
+.setting-page.dark .slider {
+  background-color: #3f3f46;
+}
+
+.setting-page.dark .avatar-image {
+  border-color: #3f3f46;
 }
 </style>

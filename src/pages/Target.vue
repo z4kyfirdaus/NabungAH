@@ -1,6 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import { getData, saveData } from '../data/storage'
+import { showAlert, showConfirm, showSelect } from '../utils/modal'
+import { useTheme } from '../utils/theme'
+
+const { isDarkMode } = useTheme()
 
 const nama = ref('')
 const target = ref('')
@@ -31,7 +35,7 @@ function resetForm() {
 
 function simpan() {
   if (!nama.value || !target.value || !deadline.value) {
-    alert('Lengkapi data')
+    showAlert('Mohon lengkapi semua data target!', 'Data Belum Lengkap', 'warning')
     return
   }
 
@@ -46,7 +50,7 @@ function simpan() {
   })
 
   saveData(data)
-  alert('Target berhasil dibuat')
+  showAlert('Target baru berhasil dibuat!', 'Berhasil', 'success')
   resetForm()
 }
 
@@ -55,13 +59,12 @@ function jadikanAktif(id){
     item.aktif = item.id === id
   })
   saveData(data)
-  alert("Target aktif berhasil diubah")
+  showAlert("Target aktif berhasil diubah!", "Berhasil", "success")
 }
 
-function hapusTarget(id) {
-  if (!confirm("Yakin ingin menghapus target beserta semua transaksinya?")) {
-    return
-  }
+async function hapusTarget(id) {
+  const confirmed = await showConfirm("Yakin ingin menghapus target ini beserta seluruh riwayat transaksinya?", "Hapus Target", "Hapus", "Batal")
+  if (!confirmed) return
 
   // Hapus target
   data.targets = data.targets.filter(item => item.id !== id)
@@ -72,37 +75,41 @@ function hapusTarget(id) {
   )
 
   saveData(data)
-  alert("Target berhasil dihapus")
+  showAlert("Target berhasil dihapus.", "Berhasil", "info")
 }
 
 // FUNGSI TARIK SALDO / PENCAIRAN KE E-WALLET
-function cairkanTarget(targetItem) {
+async function cairkanTarget(targetItem) {
   if (targetItem.saldo <= 0) {
-    alert("Belum ada saldo terkumpul di target ini yang bisa ditarik!")
+    showAlert("Belum ada saldo terkumpul di target ini yang bisa ditarik!", "Pencairan Gagal", "warning")
     return
   }
 
   if (!data.wallets || data.wallets.length === 0) {
-    alert("Kamu belum punya e-wallet atau bank di menu Wallet untuk menerima pencairan dana!")
+    showAlert("Kamu belum punya e-wallet atau bank di menu Wallet untuk menerima pencairan dana!", "Wallet Belum Ada", "warning")
     return
   }
 
-  // Pilih e-wallet / bank tujuan
-  let listWarta = "Pilih E-Wallet / Bank untuk menerima pencairan dana:\n"
-  data.wallets.forEach((w, index) => {
-    listWarta += `${index + 1}. ${w.nama} (Saldo: Rp${w.saldo.toLocaleString('id-ID')})\n`
+  // Options list for selecting wallet
+  const walletOptions = data.wallets.map(w => ({
+    label: `${w.nama} (Saldo: Rp${Number(w.saldo || 0).toLocaleString('id-ID')})`,
+    value: w.id
+  }))
+
+  const selectedWalletId = await showSelect({
+    title: 'Pencairan Dana Target',
+    message: `Pilih E-Wallet atau Rekening Bank untuk menerima dana pencairan sebesar Rp${targetItem.saldo.toLocaleString('id-ID')} dari target "${targetItem.nama}":`,
+    options: walletOptions
   })
 
-  const pilihan = prompt(listWarta + "\nMasukkan nomor pilihan e-wallet:")
-  if (!pilihan) return
+  if (!selectedWalletId) return
 
-  const indexWallet = Number(pilihan) - 1
-  if (isNaN(indexWallet) || !data.wallets[indexWallet]) {
-    alert("Pilihan e-wallet tidak valid!")
+  const walletTujuan = data.wallets.find(w => w.id === selectedWalletId)
+  if (!walletTujuan) {
+    showAlert("Pilihan e-wallet tidak valid!", "Gagal", "error")
     return
   }
 
-  const walletTujuan = data.wallets[indexWallet]
   const jumlahCair = targetItem.saldo
 
   // 1. Tambahkan saldo ke e-wallet/bank pilihan
@@ -123,12 +130,12 @@ function cairkanTarget(targetItem) {
   targetItem.saldo = 0
 
   saveData(data)
-  alert(`Berhasil! Dana sebesar Rp${jumlahCair.toLocaleString('id-ID')} telah dikembalikan ke ${walletTujuan.nama}.`)
+  showAlert(`Berhasil! Dana sebesar Rp${jumlahCair.toLocaleString('id-ID')} telah dikembalikan ke ${walletTujuan.nama}.`, "Pencairan Sukses", "success")
 }
 </script>
 
 <template>
-  <div class="page clean-theme">
+  <div class="page clean-theme" :class="{ dark: isDarkMode }">
     
     <!-- HEADER -->
     <div class="header">
@@ -725,5 +732,76 @@ input:focus {
 
 .btn-outline-red:active {
   background: #FEF2F2;
+}
+
+/* ============ DARK MODE ============ */
+.page.dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.page.dark .card,
+.page.dark .empty-state,
+.page.dark .target-item {
+  background-color: #121212;
+  background: #121212;
+  border-color: #27272a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.page.dark .upload-area,
+.page.dark .preview-container,
+.page.dark .foto-container {
+  background-color: #18181b;
+  background: #18181b;
+  border-color: #27272a;
+}
+
+.page.dark .upload-icon-box {
+  background: #1a1a2e;
+}
+
+.page.dark .header-icon-box {
+  background: #1a1a2e;
+}
+
+.page.dark .stats-grid,
+.page.dark .stat-box {
+  background-color: #18181b;
+  background: #18181b;
+  border-color: #27272a;
+}
+
+.page.dark input {
+  background-color: #18181b;
+  color: #ffffff;
+  border-color: #27272a;
+}
+
+.page.dark .header h2,
+.page.dark .section-title,
+.page.dark .target-name,
+.page.dark .list-header h3,
+.page.dark .stat-value {
+  color: #ffffff;
+}
+
+.page.dark .header p,
+.page.dark label,
+.page.dark .empty-state p,
+.page.dark .stat-label,
+.page.dark .upload-placeholder small {
+  color: #a1a1aa;
+}
+
+.page.dark .btn-outline-orange {
+  border-color: #92400e;
+  color: #fbbf24;
+}
+
+.page.dark .btn-outline-red {
+  border-color: #7f1d1d;
+  color: #f87171;
 }
 </style>

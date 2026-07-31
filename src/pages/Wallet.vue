@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { getData, saveData } from '../data/storage'
+import { showAlert, showConfirm, showPrompt, showSelect } from '../utils/modal'
+import { useTheme } from '../utils/theme'
+
+const { isDarkMode } = useTheme()
 
 const appData = getData()
 const wallets = ref([])
@@ -16,11 +20,21 @@ const totalSaldo = computed(() => {
   return wallets.value.reduce((total, item) => total + Number(item.saldo || 0), 0)
 })
 
-function tambahWallet() {
-  const nama = prompt("Masukkan Nama Wallet / Bank (Contoh: BCA, OVO, Cash):")
+async function tambahWallet() {
+  const nama = await showPrompt({
+    title: 'Buat Wallet / Bank Baru',
+    message: 'Masukkan Nama Wallet atau Bank (Contoh: BCA, OVO, Cash, Mandiri):',
+    placeholder: 'Nama Wallet / Bank'
+  })
   if (!nama) return
 
-  const inputSaldo = prompt("Masukkan Saldo Awal:")
+  const inputSaldo = await showPrompt({
+    title: 'Saldo Awal',
+    message: `Masukkan saldo awal untuk ${nama}:`,
+    placeholder: '0',
+    inputType: 'number'
+  })
+  if (inputSaldo === null) return
   const saldo = Number(inputSaldo) || 0
 
   wallets.value.push({
@@ -32,80 +46,88 @@ function tambahWallet() {
 
   saveData(appData)
   loadWallet()
+  showAlert(`Wallet "${nama}" berhasil ditambahkan!`, "Berhasil", "success")
 }
 
-function topUpSaldo() {
+async function topUpSaldo() {
   if (wallets.value.length === 0) {
-    alert("Belum ada wallet atau bank! Silakan buat wallet terlebih dahulu.")
+    showAlert("Belum ada wallet atau bank! Silakan buat wallet terlebih dahulu.", "Wallet Kosong", "warning")
     return
   }
 
-  let listWarta = "Pilih Wallet / Bank untuk ditambah saldonya:\n"
-  wallets.value.forEach((w, index) => {
-    listWarta += `${index + 1}. ${w.nama} (Saldo: ${formatRupiah(w.saldo)})\n`
+  const walletOptions = wallets.value.map(w => ({
+    label: `${w.nama} - Saldo: ${formatRupiah(w.saldo)}`,
+    value: w.id
+  }))
+
+  const selectedWalletId = await showSelect({
+    title: 'Top Up Saldo',
+    message: 'Pilih Wallet / Bank yang ingin ditambah saldonya:',
+    options: walletOptions
   })
+  if (!selectedWalletId) return
 
-  const pilihan = prompt(listWarta + "\nMasukkan nomor pilihan wallet:")
-  if (!pilihan) return
+  const targetWallet = wallets.value.find(w => w.id === selectedWalletId)
+  if (!targetWallet) return
 
-  const indexWallet = Number(pilihan) - 1
-  if (isNaN(indexWallet) || !wallets.value[indexWallet]) {
-    alert("Pilihan tidak valid!")
-    return
-  }
+  const inputTambah = await showPrompt({
+    title: 'Nominal Top Up',
+    message: `Masukkan nominal saldo yang ingin ditambah ke ${targetWallet.nama}:`,
+    placeholder: '0',
+    inputType: 'number'
+  })
+  if (!inputTambah) return
 
-  const inputTambah = prompt(`Masukkan jumlah nominal yang ingin ditambahkan ke ${wallets.value[indexWallet].nama}:`)
   const nominalTambah = Number(inputTambah)
-
   if (isNaN(nominalTambah) || nominalTambah <= 0) {
-    alert("Nominal tidak valid!")
+    showAlert("Nominal top up tidak valid!", "Gagal", "error")
     return
   }
 
-  wallets.value[indexWallet].saldo += nominalTambah
+  targetWallet.saldo += nominalTambah
 
   if (!appData.transaksi) appData.transaksi = []
   appData.transaksi.unshift({
     id: Date.now(),
     tipe: 'topup',
-    keterangan: `Top up saldo ${wallets.value[indexWallet].nama}`,
+    keterangan: `Top up saldo ${targetWallet.nama}`,
     jumlah: nominalTambah,
     tanggal: new Date().toLocaleDateString('id-ID')
   })
 
   saveData(appData)
   loadWallet()
-  alert(`Berhasil menambahkan saldo ke ${wallets.value[indexWallet].nama}!`)
+  showAlert(`Berhasil menambahkan saldo Rp${nominalTambah.toLocaleString('id-ID')} ke ${targetWallet.nama}!`, "Top Up Sukses", "success")
 }
 
-function tarikWallet() {
+async function tarikWallet() {
   if (wallets.value.length === 0) {
-    alert("Belum ada wallet atau bank yang tersedia.")
+    showAlert("Belum ada wallet atau bank yang tersedia.", "Wallet Kosong", "warning")
     return
   }
 
-  let listWarta = "Pilih Wallet / Bank yang ingin ditarik seluruh saldonya:\n"
-  wallets.value.forEach((w, index) => {
-    listWarta += `${index + 1}. ${w.nama} (Saldo: ${formatRupiah(w.saldo)})\n`
+  const walletOptions = wallets.value.map(w => ({
+    label: `${w.nama} - Saldo: ${formatRupiah(w.saldo)}`,
+    value: w.id
+  }))
+
+  const selectedWalletId = await showSelect({
+    title: 'Tarik Saldo Wallet',
+    message: 'Pilih Wallet / Bank yang ingin ditarik seluruh saldonya:',
+    options: walletOptions
   })
+  if (!selectedWalletId) return
 
-  const pilihan = prompt(listWarta + "\nMasukkan nomor pilihan wallet:")
-  if (!pilihan) return
+  const targetWallet = wallets.value.find(w => w.id === selectedWalletId)
+  if (!targetWallet) return
 
-  const indexWallet = Number(pilihan) - 1
-  if (isNaN(indexWallet) || !wallets.value[indexWallet]) {
-    alert("Pilihan tidak valid!")
-    return
-  }
-
-  const targetWallet = wallets.value[indexWallet]
   if (targetWallet.saldo <= 0) {
-    alert("Saldo di wallet ini sudah 0!")
+    showAlert("Saldo di wallet ini sudah Rp0!", "Saldo Kosong", "warning")
     return
   }
 
   const jumlahDitarik = targetWallet.saldo
-  const konfirmasi = confirm(`Tarik seluruh saldo ${targetWallet.nama} sebesar ${formatRupiah(jumlahDitarik)}? Saldo akan menjadi Rp0.`)
+  const konfirmasi = await showConfirm(`Tarik seluruh saldo ${targetWallet.nama} sebesar ${formatRupiah(jumlahDitarik)}? Saldo akan menjadi Rp0.`, "Konfirmasi Tarik Saldo", "Tarik Saldo", "Batal")
   if (!konfirmasi) return
 
   if (!appData.transaksi) appData.transaksi = []
@@ -121,7 +143,7 @@ function tarikWallet() {
 
   saveData(appData)
   loadWallet()
-  alert(`Berhasil menarik saldo dari ${targetWallet.nama}. Saldo sekarang menjadi Rp0.`)
+  showAlert(`Berhasil menarik saldo dari ${targetWallet.nama}. Saldo sekarang menjadi Rp0.`, "Tarik Saldo Sukses", "success")
 }
 
 function formatRupiah(angka) {
@@ -138,7 +160,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="wallet-page">
+  <div class="wallet-page" :class="{ dark: isDarkMode }">
     <div class="content-wrapper">
       
       <!-- HEADER -->
@@ -350,4 +372,39 @@ onMounted(() => {
   color: #8E8E93;
   font-weight: 600;
 }
-</style>e
+
+/* ============ DARK MODE ============ */
+.wallet-page.dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.wallet-page.dark .card,
+.wallet-page.dark .wallet-card {
+  background-color: #121212;
+  background: #121212;
+  border-color: #27272a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.wallet-page.dark .header-icon-box {
+  background: #1a1a2e;
+}
+
+.wallet-page.dark .header h2,
+.wallet-page.dark .content h3 {
+  color: #ffffff;
+}
+
+.wallet-page.dark .header p,
+.wallet-page.dark .empty-state {
+  color: #a1a1aa;
+}
+
+.wallet-page.dark .action-btn {
+  background: #18181b;
+  border-color: #27272a;
+  color: #60a5fa;
+}
+</style>

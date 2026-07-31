@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-wrapper">
+  <div class="auth-wrapper" :class="{ dark: isDarkMode }">
     <div class="auth-card">
       <div class="brand-header">
         <div class="logo-badge">
@@ -46,14 +46,14 @@
         <span>atau</span>
       </div>
 
-      <button @click="handleGoogleLogin" class="btn-google">
-        <svg class="google-icon" viewBox="0 0 24 24">
+      <button @click="handleGoogleLogin" class="btn-google" :disabled="loading || googleLoading">
+        <svg v-if="!googleLoading" class="google-icon" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
         </svg>
-        Masuk dengan Google
+        {{ googleLoading ? 'Memproses Google Login...' : 'Masuk dengan Google' }}
       </button>
 
       <p class="auth-footer">
@@ -67,10 +67,15 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { loginUser, loginWithGoogle } from '../../firebase/auth';
+import { showAlert } from '../../utils/modal';
+import { useTheme } from '../../utils/theme';
+
+const { isDarkMode } = useTheme();
 
 const email = ref('');
 const password = ref('');
 const loading = ref(false);
+const googleLoading = ref(false);
 const router = useRouter();
 
 const handleLogin = async () => {
@@ -79,24 +84,43 @@ const handleLogin = async () => {
     await loginUser(email.value, password.value);
     router.push('/dashboard');
   } catch (error) {
-    alert(error.message);
+    showAlert(error.message || 'Gagal masuk. Periksa email dan password kamu.', 'Gagal Masuk', 'error');
   } finally {
     loading.value = false;
   }
 };
 
 const handleGoogleLogin = async () => {
+  if (googleLoading.value || loading.value) return;
+  googleLoading.value = true;
   try {
     await loginWithGoogle();
     router.push('/dashboard');
   } catch (error) {
-    alert(error.message);
+    if (
+      error.code === 'auth/cancelled-popup-request' || 
+      error.code === 'auth/popup-closed-by-user'
+    ) {
+      // User membatalkan popup atau menekan tombol ganda
+      console.warn('Google login popup dibatalkan atau ditutup:', error.code);
+    } else if (error.code === 'auth/popup-blocked') {
+      showAlert('Popup diblokir oleh browser. Mohon izinkan popup untuk situs ini.', 'Popup Diblokir', 'warning');
+    } else if (error.code === 'auth/unauthorized-domain') {
+      showAlert('Domain ini belum diizinkan di Firebase Console (Authorized Domains).', 'Domain Tidak Diizinkan', 'error');
+    } else {
+      showAlert(error.message || 'Gagal masuk dengan Google', 'Gagal Login', 'error');
+    }
+  } finally {
+    googleLoading.value = false;
   }
 };
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
 .auth-wrapper {
+  font-family: 'Nunito', sans-serif;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -122,8 +146,8 @@ const handleGoogleLogin = async () => {
 .logo-badge {
   width: 56px;
   height: 56px;
-  background-color: #ecfdf5;
-  color: #10b981;
+  background-color: #E0F2FE;
+  color: #0061FF;
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -180,7 +204,7 @@ const handleGoogleLogin = async () => {
 }
 
 .form-group input:focus {
-  border-color: #10b981;
+  border-color: #0061FF;
 }
 
 .forgot-link {
@@ -190,26 +214,26 @@ const handleGoogleLogin = async () => {
 
 .forgot-link a {
   font-size: 12px;
-  color: #10b981;
+  color: #0061FF;
   text-decoration: none;
   font-weight: 600;
 }
 
 .btn-primary {
-  background-color: #10b981;
+  background: linear-gradient(135deg, #0061FF 0%, #38BDF8 100%);
   color: white;
   border: none;
   padding: 14px;
   border-radius: 12px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   margin-top: 8px;
-  transition: background-color 0.2s;
+  transition: opacity 0.2s;
 }
 
 .btn-primary:hover {
-  background-color: #059669;
+  opacity: 0.9;
 }
 
 .btn-primary:disabled {
@@ -257,6 +281,11 @@ const handleGoogleLogin = async () => {
   background-color: #f8fafc;
 }
 
+.btn-google:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .google-icon {
   width: 18px;
   height: 18px;
@@ -270,8 +299,59 @@ const handleGoogleLogin = async () => {
 }
 
 .auth-footer a {
-  color: #10b981;
+  color: #0061FF;
   text-decoration: none;
   font-weight: 600;
+}
+
+/* ============ DARK MODE ============ */
+.auth-wrapper.dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.auth-wrapper.dark .auth-card {
+  background-color: #121212;
+  border: 1px solid #27272a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.auth-wrapper.dark .logo-badge {
+  background-color: #1a1a2e;
+}
+
+.auth-wrapper.dark .brand-header h2 {
+  color: #ffffff;
+}
+
+.auth-wrapper.dark .brand-header p,
+.auth-wrapper.dark .form-group label,
+.auth-wrapper.dark .auth-footer {
+  color: #a1a1aa;
+}
+
+.auth-wrapper.dark .form-group input {
+  background-color: #18181b;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.auth-wrapper.dark .form-group input:focus {
+  border-color: #0061FF;
+}
+
+.auth-wrapper.dark .divider::before, 
+.auth-wrapper.dark .divider::after {
+  border-color: #27272a;
+}
+
+.auth-wrapper.dark .btn-google {
+  background-color: #18181b;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.auth-wrapper.dark .btn-google:hover {
+  background-color: #27272a;
 }
 </style>

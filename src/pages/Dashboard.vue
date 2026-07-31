@@ -3,6 +3,10 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getData } from '../data/storage'
 import { cekNotifikasi } from '../utils/notification'
+import { showAlert } from '../utils/modal'
+import { useTheme } from '../utils/theme'
+
+const { isDarkMode } = useTheme()
 
 const data = getData()
 const router = useRouter()
@@ -29,7 +33,7 @@ function bukaAi() {
 // Fungsi untuk memicu Native Push Notification (jika sudah jadi APK/PWA)
 function mintaIzinNotif() {
   if (!("Notification" in window)) {
-    alert("Browser ini tidak mendukung notifikasi sistem.")
+    showAlert("Browser ini tidak mendukung notifikasi sistem.", "Notifikasi", "info")
     return
   }
 
@@ -39,8 +43,9 @@ function mintaIzinNotif() {
         body: "Notifikasi aktif! Pengingat menabung harian siap dikirim ke HP Anda.",
         icon: "/favicon.ico"
       })
+      showAlert("Notifikasi berhasil diaktifkan!", "Notifikasi Aktif", "success")
     } else {
-      alert("Izin notifikasi ditolak.")
+      showAlert("Izin notifikasi ditolak.", "Notifikasi Ditolak", "warning")
     }
   })
 }
@@ -88,7 +93,7 @@ const perHari = computed(() => {
 </script>
 
 <template>
-  <div class="dashboard clean-theme">
+  <div class="dashboard clean-theme" :class="{ dark: isDarkMode }">
     
     <!-- BACKGROUND EFEK GRADASI & CAHAYA MODERN -->
     <div class="bg-glow-effect">
@@ -981,5 +986,89 @@ const perHari = computed(() => {
 .btn-primary:active {
   transform: scale(0.98);
   box-shadow: 0 4px 10px rgba(0, 97, 255, 0.2);
+}
+
+/* ============ DARK MODE ============ */
+.dashboard.dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.dashboard.dark .target-card,
+.dashboard.dark .card,
+.dashboard.dark .empty-state {
+  background-color: #121212;
+  background: #121212;
+  border-color: #27272a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.dashboard.dark .drawer-panel {
+  background: #0a0a0a;
+  box-shadow: -15px 0 35px rgba(0, 0, 0, 0.5);
+}
+
+.dashboard.dark .drawer-header {
+  border-bottom-color: #27272a;
+}
+
+.dashboard.dark .drawer-profile-content {
+  background: #121212;
+  border-color: #27272a;
+}
+
+.dashboard.dark .stat-box {
+  background-color: #18181b;
+  background: #18181b;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.dashboard.dark .menu-btn,
+.dashboard.dark .close-btn {
+  background: #18181b;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.dashboard.dark .header-text h2,
+.dashboard.dark .target-name,
+.dashboard.dark .stat-value,
+.dashboard.dark .section-title h3,
+.dashboard.dark .drawer-header h3,
+.dashboard.dark .drawer-user-info h4,
+.dashboard.dark .empty-state h3 {
+  color: #ffffff;
+}
+
+.dashboard.dark .greeting,
+.dashboard.dark .target-deadline,
+.dashboard.dark .stat-label,
+.dashboard.dark .empty-state p,
+.dashboard.dark .drawer-user-info p {
+  color: #a1a1aa;
+}
+
+.dashboard.dark .bg-glow-effect {
+  opacity: 0.3;
+}
+
+.dashboard.dark .drawer-ai-box {
+  background: #052e16;
+  border-color: #14532d;
+}
+
+.dashboard.dark .drawer-notif-box {
+  background: #052e16;
+  border-color: #14532d;
+}
+
+.dashboard.dark .drawer-ai-icon {
+  background: #18181b;
+}
+
+.dashboard.dark .avatar {
+  background: #1e3a5f;
 }
 </style>

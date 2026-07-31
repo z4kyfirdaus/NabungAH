@@ -298,69 +298,17 @@ code {
 /* ========================================================
    GLOBAL DARK MODE UNTUK SELURUH APLIKASI & KARTU
    ======================================================== */
+/* ========================================================
+   GLOBAL PURE BLACK DARK MODE (BASE STYLES)
+   ======================================================== */
 html.dark-mode,
 html.dark-mode body,
-html.dark-mode #app,
-html.dark-mode .page,
-html.dark-mode .dashboard,
-html.dark-mode .wallet-page,
-html.dark-mode .setting-page {
-  background-color: #121212 !important;
-  color: #F1F5F9 !important;
+html.dark-mode #app {
+  background-color: #000000;
+  color: #ffffff;
 }
 
-/* Memaksa SEMUA jenis card di seluruh aplikasi menjadi hitam gelap */
-html.dark-mode .card,
-html.dark-mode div.card,
-html.dark-mode .profile-card,
-html.dark-mode .menu-card,
-html.dark-mode .danger-card,
-html.dark-mode .target-card,
-html.dark-mode .wallet-card,
-html.dark-mode .stat-box,
-html.dark-mode .about-description,
-html.dark-mode .info-list {
-  background-color: #1E1E1E !important;
-  background: #1E1E1E !important;
-  border-color: #2C2C2E !important;
-  color: #F1F5F9 !important;
-  box-shadow: none !important;
-}
-
-/* Warna input form di seluruh halaman */
-html.dark-mode input {
-  background-color: #2C2C2E !important;
-  background: #2C2C2E !important;
-  color: #FFFFFF !important;
-  border-color: #3A3A3C !important;
-}
-
-/* Warna teks umum di seluruh aplikasi */
-html.dark-mode h1,
-html.dark-mode h2,
-html.dark-mode h3,
-html.dark-mode h4,
-html.dark-mode p,
-html.dark-mode span,
-html.dark-mode .label,
-html.dark-mode .menu-row,
-html.dark-mode .input-group label,
-html.dark-mode .info-item strong {
-  color: #F1F5F9 !important;
-}
-
-/* PAKSAAN MUTLAK: Kartu Biru (Total Tabungan) Wajib Putih Seluruhnya */
-html.dark-mode [class*="balance"],
-html.dark-mode [class*="saldo"],
-html.dark-mode [class*="total"],
-html.dark-mode div[style*="background: linear-gradient"],
-html.dark-mode div[style*="background:linear-gradient"] {
-  color: #FFFFFF !important;
-}
-
-html.dark-mode [class*="balance"] *,
-html.dark-mode [class*="saldo"] *,
-html.dark-mode [class*="total"] *,
-html.dark-mode div[style*="gradient"] * {
-  color: #FFFFFF !important;
-}
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+  color: #71717a;
+}

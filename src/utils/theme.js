@@ -7,8 +7,10 @@ const isDarkMode = ref(localStorage.getItem('nabungah_dark') === 'true')
 function applyTheme(dark) {
   if (dark) {
     document.documentElement.classList.add('dark-mode')
+    document.body.classList.add('dark-mode')
   } else {
     document.documentElement.classList.remove('dark-mode')
+    document.body.classList.remove('dark-mode')
   }
 }
 

@@ -1,7 +1,9 @@
 <script setup>
 import { computed } from 'vue'
 import { getData } from '../data/storage'
+import { useTheme } from '../utils/theme'
 
+const { isDarkMode } = useTheme()
 const data = getData()
 
 const totalMasuk = computed(() => {
@@ -35,7 +37,7 @@ const transaksiHariIni = computed(() => {
 </script>
 
 <template>
-  <div class="page clean-theme">
+  <div class="page clean-theme" :class="{ dark: isDarkMode }">
     <div class="content-wrapper">
       
       <!-- HEADER -->
@@ -335,5 +337,60 @@ const transaksiHariIni = computed(() => {
   font-size: 14px;
   font-weight: 600;
   padding: 30px;
+}
+
+/* ============ DARK MODE ============ */
+.page.dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.page.dark .card,
+.page.dark .stat-item-card,
+.page.dark .history-card,
+.page.dark .empty-history {
+  background-color: #121212;
+  background: #121212;
+  border-color: #27272a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.page.dark .main-stat-card {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.page.dark .header-icon-box {
+  background: #1a1a2e;
+}
+
+.page.dark .header h2,
+.page.dark .section-title,
+.page.dark .history-title {
+  color: #ffffff;
+}
+
+.page.dark .header p,
+.page.dark .stat-label,
+.page.dark .history-date {
+  color: #a1a1aa;
+}
+
+.page.dark .icon-box.green-bg,
+.page.dark .history-icon.bg-green-soft {
+  background-color: #064e3b;
+}
+
+.page.dark .icon-box.red-bg,
+.page.dark .history-icon.bg-red-soft {
+  background-color: #7f1d1d;
+}
+
+.page.dark .icon-box.blue-bg {
+  background-color: #1e3a8a;
+}
+
+.page.dark .icon-box.purple-bg {
+  background-color: #4c1d95;
 }
 </style>

@@ -5,6 +5,22 @@
     <link rel="icon" type="image/image/jpeg" href="/logo.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>nabungah</title>
+
+    <!-- SCRIPT PENANGKAP ERROR TINGKAT RENDAH (Wajib di sini) -->
+    <script>
+      window.addEventListener('error', function(e) {
+        var errDiv = document.createElement('div');
+        errDiv.style.cssText = 'position:fixed; top:0; left:0; right:0; background:red; color:white; padding:15px; z-index:9999; word-wrap:break-word; font-size:12px;';
+        errDiv.innerHTML = '<b>ERROR GLOBAL:</b><br>' + e.message + '<br>File: ' + (e.filename || 'N/A') + '<br>Baris: ' + (e.lineno || 'N/A');
+        document.body.appendChild(errDiv);
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var errDiv = document.createElement('div');
+        errDiv.style.cssText = 'position:fixed; top:0; left:0; right:0; background:orange; color:black; padding:15px; z-index:9999; word-wrap:break-word; font-size:12px;';
+        errDiv.innerHTML = '<b>PROMISE ERROR:</b><br>' + (e.reason ? e.reason.message || JSON.stringify(e.reason) : 'Unknown Error');
+        document.body.appendChild(errDiv);
+      });
+    </script>
   </head>
   <body>
     <div id="app"></div>

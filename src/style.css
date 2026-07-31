@@ -19,7 +19,7 @@
   letter-spacing: 0.18px;
   color-scheme: light dark;
   color: var(--text);
-  background: var(--bg);
+  background-color: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -292,16 +292,29 @@ code {
   }
 }
 
+html, body, #app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
 /* ========================================================
-   GLOBAL DARK MODE UNTUK SELURUH APLIKASI & KARTU
-   ======================================================== */
-/* ========================================================
-   GLOBAL PURE BLACK DARK MODE (BASE STYLES)
+   GLOBAL DARK MODE UNTUK SELURUH APLIKASI & PAGE
    ======================================================== */
 html.dark-mode,
 html.dark-mode body,
-html.dark-mode #app {
-  background-color: #000000;
+html.dark-mode #app,
+html.dark-mode .dashboard,
+html.dark-mode .setting-page,
+html.dark-mode .wallet-page,
+html.dark-mode .target-page,
+html.dark-mode .page,
+html.dark-mode .auth-wrapper {
+  background-color: #000000 !important;
+  background: #000000 !important;
   color: #ffffff;
 }
 

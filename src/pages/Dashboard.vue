@@ -298,11 +298,13 @@ const perHari = computed(() => {
   padding-bottom: 110px;
   background-color: #F8FAFC;
   min-height: 100vh;
-  max-width: 480px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   color: #1E293B;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* --- BACKGROUND EFEK CAHAYA DINAMIS --- */

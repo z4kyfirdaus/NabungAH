@@ -416,7 +416,8 @@ const sendQuickPrompt = (promptText) => {
   bottom: 92px;
   left: 0;
   right: 0;
-  max-width: 480px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 20px;
   box-sizing: border-box;

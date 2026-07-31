@@ -292,7 +292,7 @@ code {
   }
 }
 
-html, body, #app {
+:root, html, body, #app {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -304,9 +304,12 @@ html, body, #app {
 /* ========================================================
    GLOBAL DARK MODE UNTUK SELURUH APLIKASI & PAGE
    ======================================================== */
+:root.dark-mode,
 html.dark-mode,
+body.dark-mode,
 html.dark-mode body,
 html.dark-mode #app,
+.app-root.dark,
 html.dark-mode .dashboard,
 html.dark-mode .setting-page,
 html.dark-mode .wallet-page,

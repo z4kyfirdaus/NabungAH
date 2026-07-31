@@ -302,7 +302,7 @@ code {
 }
 
 /* ========================================================
-   GLOBAL DARK MODE UNTUK SELURUH APLIKASI & PAGE
+   GLOBAL PURE BLACK DARK MODE UNTUK SELURUH ELEMENT & APLIKASI
    ======================================================== */
 :root.dark-mode,
 html.dark-mode,
@@ -310,18 +310,108 @@ body.dark-mode,
 html.dark-mode body,
 html.dark-mode #app,
 .app-root.dark,
-html.dark-mode .dashboard,
-html.dark-mode .setting-page,
-html.dark-mode .wallet-page,
-html.dark-mode .target-page,
-html.dark-mode .page,
-html.dark-mode .auth-wrapper {
+.dark-mode .app-root,
+.dark-mode .page,
+.dark-mode .dashboard,
+.dark-mode .setting-page,
+.dark-mode .wallet-page,
+.dark-mode .target-page,
+.dark-mode .auth-wrapper,
+.dark.page,
+.dark.dashboard,
+.dark.setting-page,
+.dark.wallet-page,
+.dark.target-page,
+.dark.auth-wrapper {
   background-color: #000000 !important;
   background: #000000 !important;
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
-html.dark-mode input::placeholder,
-html.dark-mode textarea::placeholder {
-  color: #71717a;
+/* CARDS & CONTAINERS DALAM DARK MODE */
+.dark-mode .card,
+.dark-mode .form-card,
+.dark-mode .profile-card,
+.dark-mode .menu-card,
+.dark-mode .active-target-card,
+.dark-mode .empty-target-card,
+.dark-mode .history-card,
+.dark-mode .target-item,
+.dark-mode .stat-box,
+.dark-mode .wallet-card,
+.dark-mode .drawer-panel,
+.dark-mode .about-content,
+.dark-mode .about-description,
+.dark-mode .info-list,
+.dark-mode .modal-card,
+.dark-mode .target-card,
+.dark-mode .drawer-profile-content,
+.dark-mode .notif-card-box,
+.dark .card,
+.dark .form-card,
+.dark .profile-card,
+.dark .menu-card,
+.dark .active-target-card,
+.dark .empty-target-card,
+.dark .history-card,
+.dark .target-item,
+.dark .stat-box,
+.dark .wallet-card,
+.dark .drawer-panel,
+.dark .about-content,
+.dark .about-description,
+.dark .info-list,
+.dark .modal-card,
+.dark .target-card,
+.dark .drawer-profile-content,
+.dark .notif-card-box {
+  background-color: #121212 !important;
+  background: #121212 !important;
+  border-color: #27272a !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* SUB CONTAINERS & INPUTS DALAM DARK MODE */
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea,
+.dark-mode .upload-area,
+.dark-mode .preview-container,
+.dark-mode .foto-container,
+.dark-mode .input-group input,
+.dark-mode .info-item,
+.dark .input,
+.dark select,
+.dark textarea,
+.dark .upload-area,
+.dark .preview-container,
+.dark .foto-container,
+.dark .input-group input,
+.dark .info-item {
+  background-color: #18181b !important;
+  background: #18181b !important;
+  border-color: #27272a !important;
+  color: #ffffff !important;
+}
+
+/* TYPOGRAPHY DALAM DARK MODE */
+.dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6,
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+.dark-mode .section-title, .dark-mode .target-name, .dark-mode .stat-value,
+.dark .section-title, .dark .target-name, .dark .stat-value {
+  color: #ffffff !important;
+}
+
+.dark-mode p, .dark-mode label, .dark-mode span, .dark-mode small, .dark-mode .greeting,
+.dark p, .dark label, .dark span, .dark small, .dark .greeting {
+  color: #a1a1aa;
+}
+
+/* PLACEHOLDER DALAM DARK MODE */
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder,
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #71717a !important;
 }
